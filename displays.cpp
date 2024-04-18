@@ -12,18 +12,9 @@ sevenSegmentDisplay displays[8] = {
     FIVE, false, 
     SIX, false,
 };
-displayGroup minTemperatureDisplay = {
-    0, 1, 2
-};
-displayGroup maxTemperatureDisplay = {
-    0, 3, 4
-};
-displayGroup currTemperatureDisplay = {
-    5, 6, 7
-};
 
 void displaySetup() {
-    pinMode(DIGIT_SERIAL_PIN, OUTPUT);
+    pinMode(SERIAL_PIN, OUTPUT);
     pinMode(DIGIT_REGISTER_CLOCK_PIN, OUTPUT);
     pinMode(DIGIT_SHIFT_REGISTER_CLOCK_PIN, OUTPUT);
     pinMode(DIGIT_SHIFT_REGISTER_CLEAR_PIN, OUTPUT);
@@ -32,6 +23,9 @@ void displaySetup() {
     pinMode(DISPLAY_SHIFT_REGISTER_CLOCK_PIN, OUTPUT);
     pinMode(DISPLAY_SHIFT_REGISTER_CLEAR_PIN, OUTPUT);
     pinMode(DISPLAY_OUTPUT_ENABLE_PIN, OUTPUT);
+
+    digitalWrite(DIGIT_SHIFT_REGISTER_CLEAR_PIN, HIGH);
+    digitalWrite(DISPLAY_SHIFT_REGISTER_CLEAR_PIN, HIGH);
 }
 
 uint8_t floatMap(char character) {
@@ -85,6 +79,25 @@ void updateDisplayGroup(displayGroup group, float value) {
 void updateDisplay(int displayNum, uint8_t character) {
     displays[displayNum].character = character;
 }
+/*
+void displayDigit(uint8_t bits, bool decimal) {
+  if (decimal) {
+    bits = bits | DECIMAL;
+  }
+  const uint8_t bitmask = 0b00000001;
+  for (int i = 0; i < 8; i++) {
+    if (bits & bitmask) {
+      digitalWrite(SERIAL_PIN, HIGH);
+    } else {
+      digitalWrite(SERIAL_PIN, HIGH);
+    }
+    bits = (bits >> 1);
+    digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, HIGH);
+    digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, LOW);
+  }
+  digitalWrite(DIGIT_REGISTER_CLOCK_PIN, HIGH);
+  digitalWrite(DIGIT_REGISTER_CLOCK_PIN, LOW);
+}*/
 
 void enableDisplay(bool enable) {
   if(enable) {
@@ -93,12 +106,22 @@ void enableDisplay(bool enable) {
     digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, HIGH);
   }
 }
-
+void displayDigit(uint8_t bits, bool decimal) {
+    if(currentDisplay == 0) {
+        digitalWrite(SERIAL_PIN, HIGH);
+    } else {
+        digitalWrite(SERIAL_PIN, HIGH);
+    }
+    digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, HIGH);
+    digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, LOW);
+    digitalWrite(DIGIT_REGISTER_CLOCK_PIN, HIGH);
+    digitalWrite(DIGIT_REGISTER_CLOCK_PIN, LOW);
+}
 void nextDisplay() {
     if(currentDisplay == 0) {
-        digitalWrite(DISPLAY_SERIAL_PIN, LOW);
+        digitalWrite(SERIAL_PIN, LOW);
     } else {
-        digitalWrite(DISPLAY_SERIAL_PIN, LOW);
+        digitalWrite(SERIAL_PIN, LOW);
     }
     digitalWrite(DISPLAY_SHIFT_REGISTER_CLOCK_PIN, HIGH);
     digitalWrite(DISPLAY_SHIFT_REGISTER_CLOCK_PIN, LOW);
@@ -113,8 +136,9 @@ void cycleDisplay() {
     }
     uint8_t displayValue = displays[currentDisplay].character;
     uint8_t displayDecimal= displays[currentDisplay].decimal;
-    enableDisplay(false);
-    updateDisplay(displayValue, displayDecimal);
+    enableDisplay(true);
+    displayDigit(displayValue, displayDecimal);
+    //updateDisplay(displayValue, displayDecimal);
     nextDisplay();
     enableDisplay(true);
     activeDisplays = activeDisplays << 1;

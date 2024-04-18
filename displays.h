@@ -2,12 +2,11 @@
 
 #include <Arduino.h>
 
-#define DIGIT_SERIAL_PIN 13
+#define SERIAL_PIN 13
 #define DIGIT_REGISTER_CLOCK_PIN 12
 #define DIGIT_SHIFT_REGISTER_CLOCK_PIN 11
 #define DIGIT_SHIFT_REGISTER_CLEAR_PIN 10
 
-#define DISPLAY_SERIAL_PIN 13
 #define DISPLAY_REGISTER_CLOCK_PIN 9
 #define DISPLAY_SHIFT_REGISTER_CLOCK_PIN 8
 #define DISPLAY_SHIFT_REGISTER_CLEAR_PIN 7
@@ -39,6 +38,9 @@ struct displayGroup {
     uint8_t second;
     uint8_t third;
 };
+
+// Initializes display data
+void displaySetup();
 
 // Converts a number character into a seven-segment binary representation
 uint8_t floatMap(char character);
