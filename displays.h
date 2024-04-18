@@ -30,9 +30,11 @@
 
 
 struct sevenSegmentDisplay {
-  uint8_t character;
-  bool decimal;
+    uint8_t character;
+    bool decimal;
 };
+
+// Declares where within the sevenSegmentDisplay array the display's data is stored
 struct displayGroup {
     uint8_t first;
     uint8_t second;
@@ -48,10 +50,10 @@ uint8_t floatMap(char character);
 // Sets the value of a 3 display 7 segment display to a given float
 void updateDisplayGroup(displayGroup group, float value);
 
-// Sets the value of a 7 segment display to a given binary representation
-void updateDisplay(int displayNum, uint8_t character);
+// Stores a given binary representation in the register to be displayed
+void displayDigit(uint8_t bits, bool decimal);
 
-// Disables the displaying of digits to all displays
+// Disables the displaying of digits to all displays from the register
 void enableDisplay(bool enable);
 
 // Disables the current display and activates the next one

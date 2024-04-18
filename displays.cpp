@@ -29,31 +29,31 @@ void displaySetup() {
 }
 
 uint8_t floatMap(char character) {
-  if (character == '.') {
-    return DECIMAL;
-  } else if (character == '0') {
-    return ZERO;
-  } else if (character == '1') {
-    return ONE;
-  } else if (character == '2') {
-    return TWO;
-  } else if (character == '3') {
-    return THREE;
-  } else if (character == '4') {
-    return FOUR;
-  } else if (character == '5') {
-    return FIVE;
-  } else if (character == '6') {
-    return SIX;
-  } else if (character == '7') {
-    return SEVEN;
-  } else if (character == '8') {
-    return EIGHT;
-  } else if (character == '9') {
-    return NINE;
-  } else {
-    return CLEAR;
-  }
+    if (character == '.') {
+        return DECIMAL;
+    } else if (character == '0') {
+        return ZERO;
+    } else if (character == '1') {
+        return ONE;
+    } else if (character == '2') {
+        return TWO;
+    } else if (character == '3') {
+        return THREE;
+    } else if (character == '4') {
+        return FOUR;
+    } else if (character == '5') {
+        return FIVE;
+    } else if (character == '6') {
+        return SIX;
+    } else if (character == '7') {
+        return SEVEN;
+    } else if (character == '8') {
+        return EIGHT;
+    } else if (character == '9') {
+        return NINE;
+    } else {
+        return CLEAR;
+    }
 }
 
 void updateDisplayGroup(displayGroup group, float value) {
@@ -66,30 +66,27 @@ void updateDisplayGroup(displayGroup group, float value) {
             continue;
         }
         if (current == 1) {
-            group.first = mapping;
+            displays[group.first].character = mapping;
         } else if (current == 2)
         {
-            group.second = mapping;
+            displays[group.second].character = mapping;
         } else if (current == 3) {
-            group.third = mapping;
+            displays[group.third].character = mapping;
         }
         current += 1;
     }
 }
-void updateDisplay(int displayNum, uint8_t character) {
-    displays[displayNum].character = character;
-}
-/*
+
 void displayDigit(uint8_t bits, bool decimal) {
-  if (decimal) {
-    bits = bits | DECIMAL;
-  }
-  const uint8_t bitmask = 0b00000001;
-  for (int i = 0; i < 8; i++) {
+    if (decimal) {
+        bits = bits | DECIMAL;
+    }
+    const uint8_t bitmask = 0b00000001;
+    for (int i = 0; i < 8; i++) {
     if (bits & bitmask) {
-      digitalWrite(SERIAL_PIN, HIGH);
+        digitalWrite(SERIAL_PIN, HIGH);
     } else {
-      digitalWrite(SERIAL_PIN, HIGH);
+        digitalWrite(SERIAL_PIN, HIGH);
     }
     bits = (bits >> 1);
     digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, HIGH);
@@ -97,26 +94,16 @@ void displayDigit(uint8_t bits, bool decimal) {
   }
   digitalWrite(DIGIT_REGISTER_CLOCK_PIN, HIGH);
   digitalWrite(DIGIT_REGISTER_CLOCK_PIN, LOW);
-}*/
+}
 
 void enableDisplay(bool enable) {
-  if(enable) {
-    digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, LOW);
-  } else {
-    digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, HIGH);
-  }
-}
-void displayDigit(uint8_t bits, bool decimal) {
-    if(currentDisplay == 0) {
-        digitalWrite(SERIAL_PIN, HIGH);
+    if(enable) {
+        digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, LOW);
     } else {
-        digitalWrite(SERIAL_PIN, HIGH);
+        digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, HIGH);
     }
-    digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, HIGH);
-    digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, LOW);
-    digitalWrite(DIGIT_REGISTER_CLOCK_PIN, HIGH);
-    digitalWrite(DIGIT_REGISTER_CLOCK_PIN, LOW);
 }
+
 void nextDisplay() {
     if(currentDisplay == 0) {
         digitalWrite(SERIAL_PIN, LOW);
@@ -138,7 +125,6 @@ void cycleDisplay() {
     uint8_t displayDecimal= displays[currentDisplay].decimal;
     enableDisplay(true);
     displayDigit(displayValue, displayDecimal);
-    //updateDisplay(displayValue, displayDecimal);
     nextDisplay();
     enableDisplay(true);
     activeDisplays = activeDisplays << 1;
