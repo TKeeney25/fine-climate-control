@@ -30,10 +30,10 @@ DallasTemperature sensors(&oneWire);
 #pragma endregion
 
 displayGroup minTemperatureDisplay = {
-    0, 1, 2
+    1, 0, 2
 };
 displayGroup maxTemperatureDisplay = {
-    0, 3, 4
+    1, 3, 4
 };
 displayGroup currTemperatureDisplay = {
     5, 6, 7
@@ -41,6 +41,7 @@ displayGroup currTemperatureDisplay = {
 
 void setup() {
     Serial.begin(9600);
+    pinMode(MIN_TEMPERATURE_POT, INPUT);
     pinMode(COOLER_CONTROL_PIN, OUTPUT);
     pinMode(HEATER_CONTROL_PIN, OUTPUT);
     displaySetup();
@@ -64,7 +65,7 @@ unsigned long lastTemperatureControl = millis();
  * If Temperature is out of spec, run cooling/heating until
  * it is in-spec or 1 minute has passed whichever is longer
  */ 
-void controlTemperatureSimple(float currTemp) {
+void controlTemperatureSimple(float currTemp, float maxTemp, float minTemp) {
     if (millis() >= lastTemperatureControl + MILLIS_BETWEEN_CONTROLS) {
         if (currTemp >= maxTemp) {
             digitalWrite(COOLER_CONTROL_PIN, HIGH);
@@ -137,13 +138,14 @@ float previousMinTemp = 0;
 float previousMaxTemp = 0;
 float previousCurrTemp = 0;
 void loop() {
+  Serial.println(analogRead(MIN_TEMPERATURE_POT));
     // TODO add display sleeping for no activity
     if (millis() < lastDisplayCycle || millis() < previousTime) {
         // Handles the edge case for when millis overflow
         lastDisplayCycle = 0;
         previousTime = 0;
     }
-    if (millis() >= lastDisplayCycle + MILLIS_BETWEEN_DISPLAYS) {
+    if (millis() >= lastDisplayCycle + 1) {
         cycleDisplay();
         lastDisplayCycle = millis();
     }
@@ -160,7 +162,7 @@ void loop() {
     currTemp = tmp / 10.0;
     int button_state = analogRead(BUTTON_PIN);
     */
-
+    /*
     if (minTemp != previousMinTemp) {
         updateDisplayGroup(minTemperatureDisplay, minTemp);
         previousMinTemp = minTemp;
@@ -171,6 +173,5 @@ void loop() {
     }
     if (currTemp != previousCurrTemp) {
         updateDisplayGroup(currTemperatureDisplay, currTemp);
-    }
-    controlTemperatureSimple(currTemp);
+    }*/
 }

@@ -4,26 +4,31 @@ uint8_t activeDisplays = DEFAULT_ACTIVE_DISPLAYS; // Whichever display has 1 is 
 uint8_t currentDisplay = DEFAULT_CURRENT_DISPLAY;
 
 sevenSegmentDisplay displays[8] = {
-    ZERO, false,
-    ONE, true,
-    TWO, false,
-    THREE, false,
-    FOUR, true,
+    SIX, true,
+    FIVE, false,
+    SEVEN, false,
+    SIX, true,
+    SEVEN, false,
     FIVE, false, 
-    SIX, false,
+    SIX, true,
+    SEVEN, false,
 };
 
 void displaySetup() {
-    pinMode(SERIAL_PIN, OUTPUT);
+    pinMode(DIGIT_SERIAL_PIN, OUTPUT);
     pinMode(DIGIT_REGISTER_CLOCK_PIN, OUTPUT);
     pinMode(DIGIT_SHIFT_REGISTER_CLOCK_PIN, OUTPUT);
     pinMode(DIGIT_SHIFT_REGISTER_CLEAR_PIN, OUTPUT);
 
+    pinMode(DISPLAY_SERIAL_PIN, OUTPUT);
     pinMode(DISPLAY_REGISTER_CLOCK_PIN, OUTPUT);
     pinMode(DISPLAY_SHIFT_REGISTER_CLOCK_PIN, OUTPUT);
     pinMode(DISPLAY_SHIFT_REGISTER_CLEAR_PIN, OUTPUT);
     pinMode(DISPLAY_OUTPUT_ENABLE_PIN, OUTPUT);
 
+    digitalWrite(DIGIT_SHIFT_REGISTER_CLEAR_PIN, LOW);
+    digitalWrite(DISPLAY_SHIFT_REGISTER_CLEAR_PIN, LOW);
+    delay(1);
     digitalWrite(DIGIT_SHIFT_REGISTER_CLEAR_PIN, HIGH);
     digitalWrite(DISPLAY_SHIFT_REGISTER_CLEAR_PIN, HIGH);
 }
@@ -84,9 +89,9 @@ void displayDigit(uint8_t bits, bool decimal) {
     const uint8_t bitmask = 0b00000001;
     for (int i = 0; i < 8; i++) {
     if (bits & bitmask) {
-        digitalWrite(SERIAL_PIN, HIGH);
+        digitalWrite(DIGIT_SERIAL_PIN, HIGH);
     } else {
-        digitalWrite(SERIAL_PIN, HIGH);
+        digitalWrite(DIGIT_SERIAL_PIN, LOW);
     }
     bits = (bits >> 1);
     digitalWrite(DIGIT_SHIFT_REGISTER_CLOCK_PIN, HIGH);
@@ -98,17 +103,17 @@ void displayDigit(uint8_t bits, bool decimal) {
 
 void enableDisplay(bool enable) {
     if(enable) {
-        digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, LOW);
-    } else {
         digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, HIGH);
+    } else {
+        digitalWrite(DISPLAY_OUTPUT_ENABLE_PIN, LOW);
     }
 }
 
 void nextDisplay() {
     if(currentDisplay == 0) {
-        digitalWrite(SERIAL_PIN, LOW);
+        digitalWrite(DISPLAY_SERIAL_PIN, LOW);
     } else {
-        digitalWrite(SERIAL_PIN, LOW);
+        digitalWrite(DISPLAY_SERIAL_PIN, HIGH);
     }
     digitalWrite(DISPLAY_SHIFT_REGISTER_CLOCK_PIN, HIGH);
     digitalWrite(DISPLAY_SHIFT_REGISTER_CLOCK_PIN, LOW);
@@ -117,16 +122,16 @@ void nextDisplay() {
 }
 
 void cycleDisplay() {
+    enableDisplay(false);
     if (activeDisplays == 0) {
         activeDisplays = DEFAULT_ACTIVE_DISPLAYS;
         currentDisplay = DEFAULT_CURRENT_DISPLAY;
     }
     uint8_t displayValue = displays[currentDisplay].character;
     uint8_t displayDecimal= displays[currentDisplay].decimal;
-    enableDisplay(true);
-    displayDigit(displayValue, displayDecimal);
     nextDisplay();
-    enableDisplay(true);
+    displayDigit(displayValue, displayDecimal);
     activeDisplays = activeDisplays << 1;
     currentDisplay++;
+    enableDisplay(true);
 }
