@@ -13,7 +13,7 @@ DallasTemperature sensors(&oneWire);
 #define COOLER_CONTROL_PIN 5
 #define HEATER_CONTROL_PIN 4
 
-#define MILLIS_BETWEEN_DISPLAYS 200
+#define MILLIS_BETWEEN_DISPLAYS 1
 #define MILLIS_BETWEEN_CONTROLS 60000
 
 #pragma region POTENTIOMETER CONTROL
@@ -80,16 +80,6 @@ void controlTemperatureSimple(float currTemp, float maxTemp, float minTemp) {
             digitalWrite(HEATER_CONTROL_PIN, LOW);
         }
     }
-}
-
-// Threshold values of 1 should operate similar to the simple loop.
-#define HEAT_THRESHOLD -0.8
-#define COOL_THRESHOLD 1.0
-
-#define KP 1
-#define KI .0001
-#define KD .00001
-float p = 0;
 float i = 0;
 float d = 0;
 
@@ -145,7 +135,7 @@ void loop() {
         lastDisplayCycle = 0;
         previousTime = 0;
     }
-    if (millis() >= lastDisplayCycle + 1) {
+    if (millis() >= lastDisplayCycle + MILLIS_BETWEEN_DISPLAYS) {
         cycleDisplay();
         lastDisplayCycle = millis();
     }
