@@ -17,30 +17,30 @@
 #define DEFAULT_CURRENT_DISPLAY 0
 
 // A,F,B,D,E,DP,C,G
-#define CLEAR 0b00000000 // 0
-#define DECIMAL 0b00000100 // 
-#define ZERO 0b11111010 // 
-#define ONE 0b00100010 // 
-#define TWO 0b10111001 // 
-#define THREE 0b10110011 // 
-#define FOUR 0b01100011 // 
-#define FIVE 0b11010011 // 
-#define SIX 0b11011011 // 
-#define SEVEN 0b10100010 // 
-#define EIGHT 0b11111011 // 
-#define NINE 0b11100011 // 
+#define CLEAR 0b00000001 // 0
+#define DECIMAL 0b00000100 // 4
+#define ZERO 0b11111010 // 250
+#define ONE 0b00100010 // 34
+#define TWO 0b10111001 // 185
+#define THREE 0b10110011 // 179
+#define FOUR 0b01100011 // 99
+#define FIVE 0b11010011 // 211
+#define SIX 0b11011011 // 219
+#define SEVEN 0b10100010 // 162
+#define EIGHT 0b11111011 // 251
+#define NINE 0b11100011 // 227
 
 
 struct sevenSegmentDisplay {
-    uint8_t character;
-    bool decimal;
+    volatile uint8_t character;
+    volatile bool decimal;
 };
 
 // Declares where within the sevenSegmentDisplay array the display's data is stored
 struct displayGroup {
-    uint8_t first;
-    uint8_t second;
-    uint8_t third;
+    int first;
+    int second;
+    int third;
 };
 
 // Initializes display data
@@ -57,6 +57,8 @@ void displayDigit(uint8_t bits, bool decimal);
 
 // Disables the displaying of digits to all displays from the register
 void enableDisplay(bool enable);
+
+void turnOffDisplays();
 
 // Disables the current display and activates the next one
 void nextDisplay();

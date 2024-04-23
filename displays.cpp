@@ -4,14 +4,14 @@ uint8_t activeDisplays = DEFAULT_ACTIVE_DISPLAYS; // Whichever display has 1 is 
 uint8_t currentDisplay = DEFAULT_CURRENT_DISPLAY;
 
 sevenSegmentDisplay displays[8] = {
-    SIX, true,
-    FIVE, false,
-    SEVEN, false,
-    SIX, true,
-    SEVEN, false,
-    FIVE, false, 
-    SIX, true,
-    SEVEN, false,
+    {CLEAR, true},
+    {CLEAR, false},
+    {CLEAR, false},
+    {CLEAR, true},
+    {CLEAR, false},
+    {CLEAR, false}, 
+    {CLEAR, true},
+    {CLEAR, false}
 };
 
 void displaySetup() {
@@ -62,24 +62,30 @@ uint8_t floatMap(char character) {
 }
 
 void updateDisplayGroup(displayGroup group, float value) {
+    if (value < 0) {
+      value = 0.0;
+    }
+    if (value > 99) {
+      value = 99.0;
+    }
     char buffer[4];
-    snprintf(buffer, sizeof buffer, "%f", value);
-    uint8_t current = 1;
+    dtostrf(value, 3, 1, buffer);
+    int current = 1;
     for(int i = 0; i < 4; i++) {
         uint8_t mapping = floatMap(buffer[i]);
         if (mapping == DECIMAL) {
             continue;
         }
         if (current == 1) {
-            displays[group.first].character = mapping;
-        } else if (current == 2)
-        {
+            displays[group.third].character = mapping;
+        } else if (current == 2) {
             displays[group.second].character = mapping;
         } else if (current == 3) {
-            displays[group.third].character = mapping;
+            displays[group.first].character = mapping;
         }
         current += 1;
     }
+    Serial.println(displays[group.first].character); // Removing breaks code
 }
 
 void displayDigit(uint8_t bits, bool decimal) {
@@ -121,6 +127,10 @@ void nextDisplay() {
     digitalWrite(DISPLAY_REGISTER_CLOCK_PIN, LOW);
 }
 
+void turnOffDisplays() {
+    displayDigit(0, false);
+}
+
 void cycleDisplay() {
     enableDisplay(false);
     if (activeDisplays == 0) {
@@ -128,7 +138,7 @@ void cycleDisplay() {
         currentDisplay = DEFAULT_CURRENT_DISPLAY;
     }
     uint8_t displayValue = displays[currentDisplay].character;
-    uint8_t displayDecimal= displays[currentDisplay].decimal;
+    uint8_t displayDecimal = displays[currentDisplay].decimal;
     nextDisplay();
     displayDigit(displayValue, displayDecimal);
     activeDisplays = activeDisplays << 1;
